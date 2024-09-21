@@ -3,6 +3,8 @@ import { z } from "zod";
 import crypto from "node:crypto";
 import { knex } from "../database";
 
+// Cookie <-> formas da gente manter contexto entre requesições
+
 
 export async function transactionsRoutes(app: FastifyInstance){ 
 
@@ -52,11 +54,23 @@ export async function transactionsRoutes(app: FastifyInstance){
 
       const { title, amount, type } = createTranjsactionBodySchema.parse(request.body);
       
+      let sessionId = request.cookies.sessionId;
+      if (!sessionId) {
+        sessionId = crypto.randomUUID();
+        
+        reply.cookie('sessionId', sessionId, {
+          path: '/',
+          maxAge: 60 * 60 * 24 * 7 // 7 days
+        })
+
+      }
+
       await knex('transactions')
        .insert({
          id: crypto.randomUUID(),
          title,
          amount: type === 'credit' ? amount : amount * -1,
+         session_id: sessionId,
        })
 
       // HTTP Codes
