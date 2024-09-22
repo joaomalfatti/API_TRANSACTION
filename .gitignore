@@ -1,5 +1,12 @@
-db/app.db
+# Database
+db/*.db
+
+# Environments
 .env
 .env.test
-RequerimentsProject.md
+
+# Build
 build
+
+#MyProject
+RequerimentsProject.md
